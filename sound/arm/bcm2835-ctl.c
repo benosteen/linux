@@ -33,14 +33,22 @@
 
 #include "bcm2835.h"
 
+long int alsa_vol_to_bcm2835(long int vol) {
+    return (long int)(125 * vol - 10240);
+}
+
+long int bcm2835_vol_to_alsa(long int vol) {
+    return (long int)((vol + 10240) / 125);
+}
+
 static int snd_bcm2835_ctl_info(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_info *uinfo)
 {
 	if (kcontrol->private_value == PCM_PLAYBACK_VOLUME) {
 		uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
 		uinfo->count = 1;
-		uinfo->value.integer.min = -10240;
-		uinfo->value.integer.max = 2303;
+		uinfo->value.integer.min = 0;
+		uinfo->value.integer.max = 100;
 	} else if (kcontrol->private_value == PCM_PLAYBACK_MUTE) {
 		uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
 		uinfo->count = 1;
@@ -64,7 +72,7 @@ static int snd_bcm2835_ctl_get(struct snd_kcontrol *kcontrol,
 	BUG_ON(!chip && !(chip->avail_substreams & AVAIL_SUBSTREAMS_MASK));
 
 	if (kcontrol->private_value == PCM_PLAYBACK_VOLUME)
-		ucontrol->value.integer.value[0] = chip->volume;
+		ucontrol->value.integer.value[0] = bcm2835_vol_to_alsa(chip->volume);
 	else if (kcontrol->private_value == PCM_PLAYBACK_MUTE)
 		ucontrol->value.integer.value[0] = chip->mute;
 	else if (kcontrol->private_value == PCM_PLAYBACK_DEVICE)
@@ -78,20 +86,17 @@ static int snd_bcm2835_ctl_put(struct snd_kcontrol *kcontrol,
 {
 	struct bcm2835_chip *chip = snd_kcontrol_chip(kcontrol);
 	int changed = 0;
-
+	
 	if (kcontrol->private_value == PCM_PLAYBACK_VOLUME) {
 		if (chip->mute) {
 			chip->mute = 0;
 			changed = 1;
 		}
 		if (changed
-		    || (ucontrol->value.integer.value[0] != chip->volume)) {
-			int atten;
+		    || (ucontrol->value.integer.value[0] != bcm2835_vol_to_alsa(chip->volume))) {
 
-			chip->volume = ucontrol->value.integer.value[0];
+			chip->volume = alsa_vol_to_bcm2835(ucontrol->value.integer.value[0]);
 			changed = 1;
-			atten = -((chip->volume << 8) / 100);
-			chip->volume = atten;
 		}
 
 	} else if (kcontrol->private_value == PCM_PLAYBACK_MUTE) {
@@ -115,7 +120,7 @@ static int snd_bcm2835_ctl_put(struct snd_kcontrol *kcontrol,
 	return changed;
 }
 
-static DECLARE_TLV_DB_SCALE(snd_bcm2835_db_scale, -10240, 1, 1);
+static DECLARE_TLV_DB_SCALE(snd_bcm2835_db_scale, 0, 1, 1);
 
 static struct snd_kcontrol_new snd_bcm2835_ctl[] __devinitdata = {
 	{
