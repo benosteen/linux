@@ -34,11 +34,11 @@
 #include "bcm2835.h"
 
 long int alsa_vol_to_bcm2835(long int vol) {
-    return (long int)(125 * vol - 10240);
+    return (long int)(-125 * vol + 2303);
 }
 
 long int bcm2835_vol_to_alsa(long int vol) {
-    return (long int)((vol + 10240) / 125);
+    return (long int)((2304 - vol) / 125);
 }
 
 static int snd_bcm2835_ctl_info(struct snd_kcontrol *kcontrol,
