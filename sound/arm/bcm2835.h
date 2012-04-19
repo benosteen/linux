@@ -28,7 +28,7 @@
 #include <linux/workqueue.h>
 
 /* #define DUMP_RAW_DATA */
-#define AUDIO_DEBUG_ENABLE
+//#define AUDIO_DEBUG_ENABLE
 //#define AUDIO_VERBOSE_DEBUG_ENABLE
 
 /* Debug macros */
@@ -171,8 +171,7 @@ typedef struct bcm2835_chip {
 	struct platform_device *pdev[MAX_SUBSTREAMS];
 	struct bcm2835_alsa_stream *alsa_stream[MAX_SUBSTREAMS];
 
-	long int volume;   // to match ALSA 
-	// int volume;
+	int volume;
 	int dest;
 	int mute;
 } bcm2835_chip_t;
