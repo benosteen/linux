@@ -33,12 +33,18 @@
 
 #include "bcm2835.h"
 
+/*
+volume (attenuation in dB) on the given player as a 24.8 fixed
+point number. Negative values (up to -24.0dB) amplify the signal, but
+clipping could then occur.
+*/
+
 long int alsa_vol_to_bcm2835(long int vol) {
-    return (long int)(-125 * vol + 2303);
+    return (long int)(-122 * vol + 6144);
 }
 
 long int bcm2835_vol_to_alsa(long int vol) {
-    return (long int)((2304 - vol) / 125);
+    return (long int)((6144 - vol) / 122);
 }
 
 static int snd_bcm2835_ctl_info(struct snd_kcontrol *kcontrol,
@@ -120,7 +126,7 @@ static int snd_bcm2835_ctl_put(struct snd_kcontrol *kcontrol,
 	return changed;
 }
 
-static DECLARE_TLV_DB_SCALE(snd_bcm2835_db_scale, 0, 1, 1);
+static DECLARE_TLV_DB_SCALE(snd_bcm2835_db_scale, 1, 1, 1);
 
 static struct snd_kcontrol_new snd_bcm2835_ctl[] __devinitdata = {
 	{
