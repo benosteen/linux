@@ -61,7 +61,9 @@ static irqreturn_t bcm2835_playback_fifo_irq(int irq, void *dev_id)
 
 	if (alsa_stream->period_size) {
 		if ((alsa_stream->pos / alsa_stream->period_size) !=
-		    ((alsa_stream->pos + consumed) / alsa_stream->period_size))
+		    ((alsa_stream->pos + consumed) / alsa_stream->period_size) ||
+		    (alsa_stream->pos == alsa_stream->period_size))  // edge case when pos==period, first clause 
+		                                                     // will be == too even though it'll be a new period
 			new_period = 1;
 	}
 	audio_debug("updating pos cur: %d + %d max:%d new_period:%d\n",
