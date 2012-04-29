@@ -766,10 +766,10 @@ int bcm2835_audio_write(bcm2835_alsa_stream_t * alsa_stream, uint32_t count,
 		/* Send the message to the videocore */
 		success = vchi_bulk_queue_transmit(instance->vchi_handle[0],
 						   src, count,
-						   0 *
+						   1 *
 						   VCHI_FLAGS_BLOCK_UNTIL_QUEUED
 						   +
-						   1 *
+						   0 *
 						   VCHI_FLAGS_BLOCK_UNTIL_DATA_READ,
 						   NULL);
 		if (success != 0) {
