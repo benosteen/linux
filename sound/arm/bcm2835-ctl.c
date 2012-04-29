@@ -40,11 +40,11 @@ clipping could then occur.
 */
 
 long int alsa_vol_to_bcm2835(long int vol) {
-    return (long int)(-122 * vol + 6144);
+    return (long int)(-244 * vol + 6144);
 }
 
 long int bcm2835_vol_to_alsa(long int vol) {
-    return (long int)((6144 - vol) / 122);
+    return (long int)((6144 - vol) / 244);
 }
 
 static int snd_bcm2835_ctl_info(struct snd_kcontrol *kcontrol,
@@ -54,7 +54,7 @@ static int snd_bcm2835_ctl_info(struct snd_kcontrol *kcontrol,
 		uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
 		uinfo->count = 1;
 		uinfo->value.integer.min = 0;
-		uinfo->value.integer.max = 100;
+		uinfo->value.integer.max = 50;
 	} else if (kcontrol->private_value == PCM_PLAYBACK_MUTE) {
 		uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
 		uinfo->count = 1;
