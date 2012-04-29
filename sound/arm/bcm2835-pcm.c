@@ -27,7 +27,7 @@ static struct snd_pcm_hardware snd_bcm2835_playback_hw = {
 	.channels_min = 1,
 	.channels_max = 2,
 	.buffer_bytes_max = (4 * 8 - 1) * 1024,	/* Needs to be less than audioplay buffer size */
-	.period_bytes_min = 1 * 1024,
+	.period_bytes_min = 4 * 1024,
 	.period_bytes_max = (4 * 8 - 1) * 1024,
 	.periods_min = 1,
 	.periods_max = 4 * 8 - 1,
@@ -319,7 +319,7 @@ snd_bcm2835_pcm_pointer(struct snd_pcm_substream *substream)
 			  alsa_stream->pos);
 
 	audio_info(" .. OUT\n");
-	return bytes_to_frames(runtime, alsa_stream->pos);
+	return bytes_to_frames(runtime, (alsa_stream->pos + atomic_read(&alsa_stream->retrieved)) % alsa_stream->buffer_size);
 }
 
 static int snd_bcm2835_pcm_copy(struct snd_pcm_substream *substream,
